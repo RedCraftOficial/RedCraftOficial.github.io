@@ -1,0 +1,5 @@
+export * from "./Home/"
+export * from "./Projects/"
+export * from "./Shop/"
+export * from "./Project/"
+export * from "./404/"
