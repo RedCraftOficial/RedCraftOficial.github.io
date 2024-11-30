@@ -1,72 +1,93 @@
-import { useParams } from "react-router-dom"
+// import { useParams } from "react-router-dom"
 import { useState } from "react"
 
+// import { DB } from "../../config"
+import { useProjects } from "../../hooks/useProjects"
+
+import { Button } from "../../components/element"
+
 export const Project = () => {
-	const id = useParams()
+	// const id = useParams()
+	// const [pjt, carregando, erro] = useProjects(DB.projects.get_by_id(id))
 
-	const project = {
-		id,
-		title: "Projectid",
-		subtitle: "lorem ipsulorem ipsu mmlorem ipsum",
-		descriptions: "projectid",
-		cover: "/redcraft_logo.webp",
-		images: [
-			{
-				id: "123",
-				path: "/redcraft_logo.webp",
-				type: "img",
-			},
-			{
-				id: "132",
-				path: "/redcraft_logo.webp",
-				type: "3d",
-			},
-			{
-				id: "312",
-				path: "/redcraft_logo.webp",
-				type: "img",
-			},
-			{
-				id: "213",
-				path: "/redcraft_logo.webp",
-				type: "img",
-			},
-		],
-		tags: ""
-	}
+	const [pjt, carregando, erro] = useProjects("test")
 
-	const [imgSelected, setImgSelected] = useState(project.images[0])
+	if (carregando) return <p>Carregando...</p>
+	if (erro) return <p>Erro: {erro}</p>
+
+	const project = pjt[0]
+
+	const [imgSelected, setImgSelected] = useState(0)
 
 	return <div
-		className="flex gap-3 h-screen p-2"
+		className="flex flex-col gap-3 h-screen p-2"
 	>
-		<div>
-			<ul
-				className="flex flex-col gap-3"
+		{project.imgs.length
+			? <div
+				className="bg-[#262423] h-fit p-8"
 			>
-				{
-					project.images.map((image) =>
-						<li
-							className={`p-2 rounded border-2 w-fit cursor-pointer ${image.id == imgSelected.id
-								? "border-blue-500"
-								: "border-transparent"}`
+				<img
+					className="w-80 h-80 object-contain"
+					src={project.imgs[imgSelected]}
+				/>
+				<ul
+					className="flex gap-1"
+				>
+					{
+						project.imgs.map((img, i) =>
+							<li
+								className={`p-2 rounded border-2 w-fit cursor-pointer ${i == imgSelected
+									? "border-blue-500"
+									: "bg-[#3d3938] border-transparent"}`
+								}
+								onClick={_ => setImgSelected(i)}
+								key={"img-" + i}
+							>
+								<img
+									src={img}
+									className="w-20 h-20 object-contain"
+								/>
+							</li>
+						)
+					}
+				</ul>
+			</div>
+			: null
+		}
+
+		<div className="bg-[#262423] h-fit p-3">
+			{project.description
+				? <div
+					className=""
+				>
+					<h2>Descrição:</h2>
+					<p>
+						{project.description}
+					</p>
+				</div>
+				: null
+			}
+			{project.mcpack
+				? <div
+					className="mt-20"
+				>
+					<Button
+						onClick={() => {
+							const newTab = window.open(
+								`https://drive.google.com/uc?export=download&id=${project.mcpack}`,
+								'_blank')
+							if (newTab) {
+								newTab.focus();
+							} else {
+								console.error("Falha ao abrir a nova aba. Verifique as configurações do navegador.");
 							}
-							onClick={_ => setImgSelected(image)}
-							key={image.id}
-						>
-							<img
-								src={image.path}
-								className="w-32 h-32 object-contain"
-							/>
-						</li>
-					)
-				}
-			</ul>
+						}}
+						label="Baixar"
+					/>
+				</div>
+				: null
+			}
 		</div>
-		<img
-			className="w-full h-full object-contain"
-			src={imgSelected.path}
-		/>
 	</div>
 }
 
